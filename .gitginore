@@ -1,0 +1,26 @@
+# Data dan checkpoint (keputusan PRD: tidak di-commit)
+/data/
+/checkpoints/
+*.pt
+*.pth
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Jupyter/Colab
+.ipynb_checkpoints/
+
+# Editor
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+._*
+
+# Windows
+Thumbs.db
+desktop.ini
