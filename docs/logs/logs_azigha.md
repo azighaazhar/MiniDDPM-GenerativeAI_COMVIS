@@ -1,6 +1,7 @@
 # Log Interaksi Ketua
 
 LOG INTERAKSI LLM - KELOMPOK [ISI nama kelompok]
+- Nama Sesi: 01_2026-10-24_perencanaan-prd
 - Tanggal Sesi: [28/10/2026]
 - Target Modul: Perencanaan dan PRD
 - Tautan Sesi Chat: (https://claude.ai/share/b7b6fba3-43da-4edf-9064-a420d44c70ee)
@@ -18,6 +19,7 @@ KRONOLOGI PROMPT & RESPONS:
 
 ---
 
+- Nama Sesi: 02_2026-10-24_config-utils-diffusion
 - Tanggal Sesi: [28/10/2026]
 - Target Modul: config.py, utils.py, diffusion.py
 - Tautan Sesi Chat: (https://claude.ai/share/8fa3cc9e-67ea-469d-8869-1423e5cf25e9)
@@ -58,9 +60,10 @@ Format: tulis kodenya modular, diberi komentar, tanpa menyalin dari tutorial. Je
 
 ---
 
+- Nama Sesi: 03_2026-10-24_model-unet
 - Tanggal Sesi: [28/10/2026]
 - Target Modul: model.py (timestep embedding sinusoidal dan U-Net)
-- Tautan Sesi Chat: [ISI link chat 03]
+- Tautan Sesi Chat: (https://claude.ai/share/ee1dfdad-008c-4ffa-b143-099369c60048)
 
 KRONOLOGI PROMPT & RESPONS:
 1. TAHAP INISIASI (Meminta Kode Awal)
