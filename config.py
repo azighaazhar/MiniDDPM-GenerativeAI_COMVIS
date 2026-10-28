@@ -33,14 +33,17 @@ NUM_WORKERS = 0  # DataLoader tanpa proses worker (aman di macOS dan Windows)
 # ---------------------------------------------------------------------------
 T = 1000  # jumlah timestep baseline; boleh ditimpa oleh experiments.py
 
-# Acuan untuk T=1000. Penyesuaian beta saat T berubah diputuskan
-# di sesi diffusion.py.
+# Acuan untuk T=1000. Saat T berubah, diffusion.py menskalakan beta
+# dengan BETA_REFERENCE_T / T agar total noise tetap sama.
 BETA_START = 1e-4
 BETA_END = 0.02
+BETA_REFERENCE_T = 1000  # T tempat BETA_START dan BETA_END berlaku apa adanya
 
 # ---------------------------------------------------------------------------
 # Model (parameter pembentuk U-Net)
 # ---------------------------------------------------------------------------
+IMAGE_SIZE = 28  # sisi gambar MNIST (28x28); channel ada di MODEL_PARAMS
+
 # Dipakai sebagai UNet(**MODEL_PARAMS) dan disimpan di checkpoint.
 # Nama kunci harus cocok dengan argumen konstruktor UNet di model.py.
 # channel_mults (1, 2, 2) = dua downsampling: 28 -> 14 -> 7.
@@ -97,17 +100,21 @@ if __name__ == "__main__":
     # Konsistensi nilai
     assert 0 < BETA_START < BETA_END < 1, "beta harus 0 < start < end < 1"
     assert T > 0 and BATCH_SIZE > 0 and EPOCHS > 0
+    assert BETA_REFERENCE_T > 0 and IMAGE_SIZE > 0
+    assert BETA_END * BETA_REFERENCE_T / T < 1, "beta akhir (setelah skala) harus < 1"
     assert SMOKE_SAMPLE_EVERY <= SMOKE_EPOCHS, "smoke: N harus <= jumlah epoch"
     assert SMOKE_SUBSET_SIZE >= BATCH_SIZE, "subset smoke harus >= batch size"
 
-    # Dua downsampling dari 28: 28 -> 14 -> 7
+    # Dua downsampling dari IMAGE_SIZE: 28 -> 14 -> 7
     n_down = len(MODEL_PARAMS["channel_mults"]) - 1
-    size = 28
+    size = IMAGE_SIZE
     for _ in range(n_down):
+        assert size % 2 == 0, "ukuran gambar harus habis dibagi 2 di tiap downsampling"
         size //= 2
     assert n_down == 2 and size == 7, "U-Net harus 28 -> 14 -> 7"
 
     print(f"SEED={SEED}  LR={LEARNING_RATE}  T={T}  "
           f"BATCH_SIZE={BATCH_SIZE}(sementara)  EPOCHS={EPOCHS}(sementara)")
+    print(f"BETA_REFERENCE_T={BETA_REFERENCE_T}  IMAGE_SIZE={IMAGE_SIZE}")
     print(f"MODEL_PARAMS   : {MODEL_PARAMS}")
     print("config.py OK")
