@@ -24,3 +24,6 @@ venv/
 # Windows
 Thumbs.db
 desktop.ini
+
+# output smoke test (train/sample Teman B)
+*_smoke*
