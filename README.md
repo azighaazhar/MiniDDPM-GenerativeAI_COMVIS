@@ -1,126 +1,74 @@
 # Mini DDPM pada MNIST
 
-Model difusi Mini DDPM yang dibangun dari nol dengan Python dan PyTorch. Model dilatih pada MNIST (28x28, 1 channel) dan menghasilkan digit tulisan tangan dari noise murni. Seluruh kode dibuat lewat kolaborasi dengan LLM (vibe coding) untuk tugas besar kelompok.
+Model difusi (DDPM) kecil yang dibangun dari nol dengan PyTorch. Modelnya dilatih pada MNIST (28x28, satu channel) dan bisa membuat digit tulisan tangan dari noise murni. Seluruh kode dibuat lewat vibe coding bersama Claude, untuk Proyek 1 mata kuliah Generative AI (CAK4KBB3), Universitas Telkom.
 
-## Versi Python
+## Isi repo
 
-**Wajib Python 3.14** (ketua memakai 3.14.6). Semua anggota memakai versi yang sama. Cek dengan:
+| Lokasi | Isi |
+|---|---|
+| `MiniDDPM.ipynb` | Notebook final, semua kode ada di sini |
+| `notebooks/` | Notebook kerja tiap anggota (ketua, Teman A, Teman B) |
+| `results/` | Grafik loss, grid gambar, dan tabel hasil eksperimen |
+| `docs/prd_final_miniddpm_notebook.md` | PRD kelompok |
+| `docs/logs_template/` | Log interaksi LLM tiap anggota, mengikuti template di panduan |
+| `docs/chat_exports(cadangan_link_jika_bermasalah)/` | Salinan teks chat sebagai cadangan share link |
+| `rakit.py` | Skrip penggabung sel, penjelasannya di bawah |
 
-```
-python --version
-```
+Folder `data/` (unduhan MNIST) dan `checkpoints/` dibuat saat notebook dijalankan dan tidak ikut Git.
 
-## Instalasi
+## Cara menjalankan
 
-Semua perintah dijalankan dari root repo.
+1. Siapkan Python 3.12 atau 3.14, lalu buat virtual environment:
 
-1. Buat dan aktifkan virtual environment.
-
-   Windows:
    ```
-   python -m venv .venv
-   .venv\Scripts\activate
-   ```
-
-   macOS / Linux:
-   ```
-   python -m venv .venv
-   source .venv/bin/activate
+   python -m venv venv
+   venv\Scripts\activate
    ```
 
-2. Pasang dependensi:
+   Di macOS atau Linux, aktifkan dengan `source venv/bin/activate`.
+
+2. Pasang paket.
+
+   Windows dengan GPU NVIDIA: pasang PyTorch versi CUDA dulu. Kami memakai CUDA 12.6, perintah terbaru ada di pytorch.org/get-started/locally.
+
+   ```
+   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126
+   pip install -r requirements.txt
+   ```
+
+   macOS atau tanpa GPU NVIDIA:
+
    ```
    pip install -r requirements.txt
    ```
 
-3. Cek device yang terdeteksi:
-   ```
-   python utils.py
-   ```
-   Device dipilih otomatis dengan urutan cuda, lalu mps, lalu cpu. Tidak ada device yang ditulis tetap di kode.
+3. Buka `MiniDDPM.ipynb` di VS Code, pilih kernel `venv`, lalu klik Run All. Saat pertama kali, MNIST diunduh otomatis ke `data/`, jadi perlu internet.
 
-   **Catatan Windows dengan GPU NVIDIA:** paket `torch` dari PyPI untuk Windows adalah versi CPU saja. Jika `python utils.py` menampilkan `cpu` padahal ada GPU NVIDIA, pasang ulang `torch==2.14.0` dan `torchvision==0.29.0` dengan perintah dari https://pytorch.org/get-started/locally/ (pilih Pip, Windows, dan versi CUDA yang sesuai).
+Perangkat dipilih otomatis dengan urutan cuda, mps, lalu cpu. Tanpa GPU NVIDIA notebook tetap jalan, tetapi training penuh jauh lebih lama.
 
-## Konfigurasi
+## Uji cepat (smoke test)
 
-Semua nilai baseline (seed, batch size, epoch, learning rate, T, parameter model, smoke test, interval grid sampel, path) ada di `config.py`. Hanya ketua yang mengubah file ini. File lain membaca nilainya dari sana dan tidak menulis angka tetap.
+Di bagian 2 Config, pada sel kode kedua, ubah `config.SMOKE_TEST = True`. Notebook hanya memakai 512 gambar dan 2 epoch, jadi seluruh alur bisa dicek dalam beberapa menit. Kembalikan ke `False` untuk training sungguhan. File hasil uji ini bernama `*_smoke*` dan tidak ikut Git.
 
-## Cara menjalankan
+## Hasil
 
-### Uji mandiri modul milik ketua
+- Training penuh dijalankan di laptop dengan GPU GTX 1650 (4 GB), Windows, Python 3.12.4, PyTorch 2.14.1 dengan CUDA 12.6.
+- 20 epoch per konfigurasi, batch size 64, sekitar 86 detik per epoch. Kelima konfigurasi selesai dalam sekitar 2,5 jam.
+- Lima konfigurasi: baseline (learning rate 2e-4, T 1000), learning rate 1e-4, learning rate 5e-4, T 250, dan T 500.
+- Loss akhir kelimanya berada di 0,0218 sampai 0,0224. Tabel lengkap ada di `results/experiments.md`.
 
-```
-python config.py
-python utils.py
-python diffusion.py
-python model.py
-```
+## Isi notebook
 
-### Memeriksa data
+Bagian 1 Import, 2 Config, dan 3 Utils (ketua). Bagian 4 Dataset dan 5 Visualize (Teman A). Bagian 6 Model U-Net dan 7 Diffusion (ketua). Bagian 8 Experiments, 9 Train, 10 Sample, 12 Eksekusi baseline, dan 13 Eksperimen dan hasil (Teman B). Bagian 14 adalah ringkasan hasil. Nomor 11 tidak dipakai karena sel uji hanya ada di notebook kerja.
 
-Jalankan pertama kali dengan koneksi internet karena MNIST diunduh otomatis ke `data/`.
+## Pembagian kerja
 
-```
-python -m scripts.check_data
-```
+| Anggota | Peran | Bagian |
+|---|---|---|
+| Muhammad Azigha Azhar | Ketua, Prompt Engineer dan LLM Navigator | config, utils, model, diffusion, perakitan notebook, training penuh |
+| Mutiara Syaikha Husnaa | Teman A, Data Pipeline dan Preprocessing | dataset, visualize |
+| Lilia Gita Savitri | Teman B, Training Loop dan Hyperparameter Tuning | experiments, train, sample, eksperimen |
 
-### Training (disesuaikan setelah train.py dan sample.py jadi)
+## Tentang rakit.py
 
-Training dengan baseline:
-
-```
-python train.py
-```
-
-Eksperimen dengan konfigurasi bernama (nama diambil dari `experiments.py`, yang hanya menimpa learning rate dan/atau T):
-
-```
-python train.py <nama_konfigurasi>
-```
-
-Checkpoint disimpan di `checkpoints/`. Grafik loss dan grid sampel disimpan di `results/`.
-
-### Sampling (disesuaikan setelah train.py dan sample.py jadi)
-
-```
-python sample.py
-```
-
-Hasil grid gambar disimpan di `results/samples/`.
-
-## Struktur folder
-
-```
-mini-ddpm-mnist/
-├── README.md
-├── requirements.txt
-├── .gitignore
-├── config.py              nilai baseline
-├── model.py               timestep embedding, blok dasar, U-Net
-├── diffusion.py           noise schedule, forward process, sampling
-├── utils.py               seed dan pemilihan device
-├── experiments.py         konfigurasi eksperimen (learning rate, T)
-├── train.py               training loop
-├── sample.py              sampling dari checkpoint
-├── dataset.py             DataLoader MNIST
-├── visualize.py           grid gambar dan grafik loss
-├── scripts/
-│   └── check_data.py      pemeriksaan data
-├── data/                  unduhan MNIST (tidak di-commit)
-├── checkpoints/           checkpoint (tidak di-commit)
-├── results/               hasil (di-commit)
-│   ├── loss_curves/
-│   ├── samples/
-│   └── experiments.md
-└── docs/
-    ├── logs/              log LLM per anggota
-    ├── LOG_INTERAKSI_GABUNGAN.md
-    └── chat_exports/      ekspor chat tiap anggota
-```
-
-## Aturan kerja
-
-- Satu file satu pemilik; setiap anggota hanya mengubah file miliknya.
-- Tiap anggota commit ke branch sendiri; ketua menggabungkan ke `main`.
-- Dilarang menyalin kode dari GitHub atau blog tutorial.
-- Setiap sesi LLM dicatat di `docs/logs/` dan chat-nya disimpan sebagai share link atau ekspor di `docs/chat_exports/`.
+Kode awalnya ditulis sebagai file `.py`, lalu atas arahan dosen dipindah ke notebook. `rakit.py` adalah skrip hasil LLM (chat sesi 04) yang menggabungkan sel dari tiga notebook kerja menjadi `MiniDDPM.ipynb`. Skrip ini dijalankan sekali, tidak dipakai untuk menjalankan model, dan disimpan sebagai bukti proses perakitan.

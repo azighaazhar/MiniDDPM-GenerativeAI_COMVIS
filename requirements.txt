@@ -1,5 +1,7 @@
-# WAJIB: Python 3.14, lihat README
-torch==2.14.0
-torchvision==0.29.0
-numpy>=2.3.2
-matplotlib>=3.10.7
+# Diuji di Python 3.12 dan 3.14
+# Windows dengan GPU NVIDIA: pasang torch versi CUDA dulu (lihat README), lalu pasang file ini
+torch==2.14.1
+torchvision==0.29.1
+numpy==2.5.4
+matplotlib==3.11.2
+ipykernel==7.4.0
